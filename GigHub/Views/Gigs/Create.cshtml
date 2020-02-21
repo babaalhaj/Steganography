@@ -27,7 +27,7 @@
 
         <div class="form-group">
             <label asp-for="Genre"></label>
-            <select class="form-control" asp-items="@(new SelectList(Model.Genres, "Id", "Name"))">
+            <select asp-for="Genre" class="form-control" asp-items="@(new SelectList(Model.Genres, "Id", "Name"))">
                 <option></option>
             </select>
         </div>

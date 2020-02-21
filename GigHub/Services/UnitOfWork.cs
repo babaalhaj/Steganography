@@ -7,6 +7,7 @@ namespace GigHub.Services
     {
         private readonly ApplicationDbContext _context;
         private IGenresRepository _genres;
+        private IGigsRepository _gigs;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -14,6 +15,7 @@ namespace GigHub.Services
         }
 
         public IGenresRepository Genres => _genres ??= new GenresRepository(_context);
+        public IGigsRepository Gigs => _gigs ??= new GigsRepository(_context);
 
         public async Task<int> AsyncComplete()
         {
