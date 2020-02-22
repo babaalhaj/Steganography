@@ -4,7 +4,6 @@ using GigHub.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace GigHub.Controllers
 {
@@ -31,18 +30,19 @@ namespace GigHub.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
         public IActionResult Create(GigsFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
+                model.Genres = _unitOfWork.Genres.GetGenres();
                 return View(model);
             }
 
             var gig = new Gig
             {
                 ArtistId = _userManager.GetUserId(User), 
-                DateTime = DateTime.Parse($"{model.Date} {model.Time}"), GenreId = model.Genre, Venue = model.Venue
+                DateTime = model.GetDateTime(), GenreId = model.Genre, Venue = model.Venue
             };
 
             _unitOfWork.Gigs.AddAGig(gig);

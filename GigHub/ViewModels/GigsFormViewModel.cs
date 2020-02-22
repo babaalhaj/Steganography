@@ -1,4 +1,6 @@
-﻿using GigHub.Models;
+﻿using GigHub.BusinessRules;
+using GigHub.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -9,15 +11,18 @@ namespace GigHub.ViewModels
         [Required]
         public string Venue { get; set; }
 
-        [Required]
+        [Required, FutureDate]
         public string Date { get; set; }
 
-        [Required]
+        [Required, ValidTime]
         public string Time { get; set; }
 
-        [Required]
+        [Required, Display(Name = "Genre")]
         public byte Genre { get; set; }
 
         public IEnumerable<Genre> Genres { get; set; }
+
+        public DateTime GetDateTime() => DateTime.Parse($"{Date} {Time}");
+        
     }
 }
