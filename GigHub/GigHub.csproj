@@ -5,6 +5,11 @@
     <UserSecretsId>aspnet-GigHub-69C1F4DD-ED83-46EE-969B-6F54473A6B27</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20200222095221_ExtendIdentityAddNameColumn.cs" />
+    <Compile Remove="Data\Migrations\20200222095221_ExtendIdentityAddNameColumn.Designer.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.1" />
