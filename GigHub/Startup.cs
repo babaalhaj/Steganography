@@ -1,6 +1,7 @@
+using GigHub.Contracts;
 using GigHub.Data;
 using GigHub.Models;
-using GigHub.Services;
+using GigHub.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;

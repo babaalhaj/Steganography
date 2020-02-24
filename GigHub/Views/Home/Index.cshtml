@@ -1,4 +1,7 @@
-﻿@model IEnumerable<Gig>
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<Gig>
+
+
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -7,11 +10,25 @@
     <h1 class="display-4">Find the next event You'll want to attend</h1>
 </div>
 
-<h6 class="display-5">Latest Gigs</h6>
-<h6 class="display-5">Upcoming Gigs</h6>
-<ul>
+<h6 class="display-5 voffset2">Upcoming Gigs</h6>
+
+<div class="card-deck">
     @foreach (var gig in Model)
     {
-        <li>@gig.DateTime.ToShortDateString() - @gig.Artist.Name</li>
+        var photoPath = "~/images/" + (gig.ImageUrl ?? "noimage.jpg");
+        <div class="card">
+            <img src=@photoPath class="card-img-top imageThumbnail" alt="@gig.Artist.Name" asp-append-version="true">
+            <div class="card-body">
+                <h5 class="card-title">@gig.Artist.Name</h5>
+                <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
+                <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
+                <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
+                <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
+            </div>
+            <div class="card-footer">
+                <small class="text-muted text-center"><a href="#">Edit</a> | <a href="#">Delete</a></small>
+            </div>
+        </div> 
     }
-</ul>
+   
+</div>

@@ -1,9 +1,10 @@
-﻿using GigHub.Data;
-using GigHub.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using GigHub.Contracts;
+using GigHub.Data;
+using GigHub.Models;
 
-namespace GigHub.Services
+namespace GigHub.Repository
 {
     public class GenresRepository : IGenresRepository
     {

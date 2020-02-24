@@ -1,11 +1,12 @@
-﻿using GigHub.Data;
-using GigHub.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GigHub.Contracts;
+using GigHub.Data;
+using GigHub.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace GigHub.Services
+namespace GigHub.Repository
 {
     public class GigsRepository : IGigsRepository
     {
@@ -22,7 +23,7 @@ namespace GigHub.Services
 
         public IEnumerable<Gig> GetUpcomingGigs()
         {
-            return _context.Gigs.Include(g => g.Artist)
+            return _context.Gigs.Include(g => g.Artist).Include(g=>g.Genre)
                 .Where(g => g.DateTime > DateTime.Now);
         }
     }

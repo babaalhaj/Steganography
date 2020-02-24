@@ -21,5 +21,7 @@ namespace GigHub.Models
         [Required]
         public byte GenreId { get; set; }
 
+        public string ImageUrl { get; set; }
+
     }
 }

@@ -1,7 +1,7 @@
-﻿using GigHub.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using GigHub.Models;
 
-namespace GigHub.Services
+namespace GigHub.Contracts
 {
     public interface IGenresRepository
     {

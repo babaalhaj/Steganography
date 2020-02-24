@@ -1,7 +1,8 @@
-﻿using GigHub.Data;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using GigHub.Contracts;
+using GigHub.Data;
 
-namespace GigHub.Services
+namespace GigHub.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {

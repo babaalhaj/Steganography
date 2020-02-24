@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace GigHub.Services
+namespace GigHub.Contracts
 {
     public interface IUnitOfWork
     {

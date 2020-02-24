@@ -1,5 +1,6 @@
 ﻿using GigHub.BusinessRules;
 using GigHub.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -23,6 +24,8 @@ namespace GigHub.ViewModels
         public IEnumerable<Genre> Genres { get; set; }
 
         public DateTime GetDateTime() => DateTime.Parse($"{Date} {Time}");
+
+        public IFormFile Photo { get; set; }
         
     }
 }
