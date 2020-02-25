@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Gig>
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Find the next event You'll want to attend</h1>
+</div>
+
+<h6 class="display-5 voffset2">Upcoming Gigs</h6>
+
+<div class="card-deck">
+    @foreach (var gig in Model.Take(3))
+    {
+        var photoPath = "~/images/" + (gig.ImageUrl ?? "noimage.jpg");
+        <div class="card m-3 card-arrangements">
+            <img src=@photoPath class="card-img-top imageThumbnail  img-fluid" alt="@gig.Artist.Name" asp-append-version="true">
+            <div class="card-body">
+                <h5 class="card-title text-center">@gig.Artist.Name</h5>
+                <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
+                <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
+                <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
+                <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
+            </div>
+            @*<div class="card-footer">
+                    <small class="text-muted text-center"><a href="#">Edit</a> | <a href="#">Delete</a></small>
+                </div>*@
+
+        </div>
+    }
+
+</div>
+
+
+<p >
+    @if (Model.Count() > 3)
+    {
+        <a asp-controller="Gigs" asp-action="AllUpcomingGigs" class="badge badge-success">Show more &raquo;</a>
+    }
+</p>
+

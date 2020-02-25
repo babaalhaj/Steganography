@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using GigHub.Models;
+﻿using GigHub.Models;
+using System.Collections.Generic;
 
 namespace GigHub.Contracts
 {
@@ -7,6 +7,7 @@ namespace GigHub.Contracts
     {
         void AddAGig(Gig gig);
         IEnumerable<Gig> GetUpcomingGigs();
+        IEnumerable<Gig> GetMyUpcomingGigs(string artistId);
         //Gig FindGigById(int id);
         //bool DeleteAGig(Gig gig);
     }

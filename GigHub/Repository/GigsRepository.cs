@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GigHub.Contracts;
+﻿using GigHub.Contracts;
 using GigHub.Data;
 using GigHub.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GigHub.Repository
 {
@@ -25,6 +25,12 @@ namespace GigHub.Repository
         {
             return _context.Gigs.Include(g => g.Artist).Include(g=>g.Genre)
                 .Where(g => g.DateTime > DateTime.Now);
+        }
+
+        public IEnumerable<Gig> GetMyUpcomingGigs(string artistId)
+        {
+            return _context.Gigs.Include(g => g.Artist).Include(g=>g.Genre)
+                .Where(g => g.DateTime > DateTime.Now && g.ArtistId == artistId);
         }
     }
 }

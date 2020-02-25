@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using GigHub.Contracts;
+﻿using GigHub.Contracts;
+using GigHub.Models;
+using GigHub.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using GigHub.Models;
+using System.Diagnostics;
 
 namespace GigHub.Controllers
 {
