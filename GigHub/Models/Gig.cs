@@ -1,11 +1,16 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GigHub.Models
 {
     public class Gig
     {
         public int Id { get; set; }
+
+        [NotMapped]
+        public string EncryptedGigId { get; set; }
+
         public ApplicationUser Artist { get; set; }
 
         [Required]

@@ -2,6 +2,7 @@ using GigHub.Contracts;
 using GigHub.Data;
 using GigHub.Models;
 using GigHub.Repository;
+using GigHub.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -30,9 +31,10 @@ namespace GigHub
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+           
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddSingleton<DataProtectionPurposeStrings>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

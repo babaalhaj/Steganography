@@ -1,12 +1,15 @@
 ﻿using GigHub.Contracts;
 using GigHub.Models;
+using GigHub.Security;
 using GigHub.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace GigHub.Controllers
 {
@@ -15,11 +18,14 @@ namespace GigHub.Controllers
     {
         private readonly IUnitOfWork _unitOfWork; private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHostEnvironment _hostEnvironment;
+        private readonly IDataProtector _protector;
 
         public GigsController(IUnitOfWork unitOfWork, 
-            UserManager<ApplicationUser> userManager, IHostEnvironment hostEnvironment)
+            UserManager<ApplicationUser> userManager, IHostEnvironment hostEnvironment,
+            IDataProtectionProvider dataProtectionProvider, DataProtectionPurposeStrings dataProtectionPurposeStrings)
         {
             _unitOfWork = unitOfWork; _userManager = userManager; _hostEnvironment = hostEnvironment;
+            _protector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.GigIdRouteValue);
         }
 
         public IActionResult Create()
@@ -57,9 +63,11 @@ namespace GigHub.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult Edit(int id)
+        public IActionResult Edit(string id)
         {
-            var gig = _unitOfWork.Gigs.FindGigById(id);
+            var empId = Convert.ToInt32(_protector.Unprotect(id));
+            var gig = _unitOfWork.Gigs.FindGigById(empId);
+
             var model = new EditGigFormViewModel(gig)
             {
                 Genres = _unitOfWork.Genres.GetGenres()
@@ -83,13 +91,23 @@ namespace GigHub.Controllers
         [AllowAnonymous]
         public IActionResult AllUpcomingGigs()
         {
-            return View(_unitOfWork.Gigs.GetUpcomingGigs());
+            return View(_unitOfWork.Gigs.GetUpcomingGigs()
+                .Select(g =>
+            {
+                g.EncryptedGigId = _protector.Protect(g.Id.ToString());
+                return g;
+            }));
         }
 
         public IActionResult MyUpcomingGigs()
         {
             var artistId = _userManager.GetUserId(User);
-            return View(_unitOfWork.Gigs.GetMyUpcomingGigs(artistId));
+            return View(_unitOfWork.Gigs.GetMyUpcomingGigs(artistId)
+                .Select(g =>
+            {
+                g.EncryptedGigId = _protector.Protect(g.Id.ToString());
+                return g;
+            }));
         }
 
         private string GetFileName(GigsFormViewModel model, out string filePath)
