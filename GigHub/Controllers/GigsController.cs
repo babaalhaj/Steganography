@@ -57,6 +57,29 @@ namespace GigHub.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        public IActionResult Edit(int id)
+        {
+            var gig = _unitOfWork.Gigs.FindGigById(id);
+            var model = new EditGigFormViewModel(gig)
+            {
+                Genres = _unitOfWork.Genres.GetGenres()
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(EditGigFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Genres = _unitOfWork.Genres.GetGenres();
+                return View(model);
+            }
+
+            var artistId = _userManager.GetUserId(User);
+            return RedirectToAction("MyUpcomingGigs", _unitOfWork.Gigs.GetMyUpcomingGigs(artistId));
+        }
+
         [AllowAnonymous]
         public IActionResult AllUpcomingGigs()
         {

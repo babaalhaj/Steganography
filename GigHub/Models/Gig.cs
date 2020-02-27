@@ -18,7 +18,7 @@ namespace GigHub.Models
 
         public Genre Genre { get; set; }
 
-        [Required]
+        [Required, Display(Name = "Genre")]
         public byte GenreId { get; set; }
 
         public string ImageUrl { get; set; }

@@ -25,7 +25,10 @@
                 <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
             </div>
             <div class="card-footer" style="font-weight: bolder;">
-                    <small class="text-muted text-center"><a href="#">Edit</a> | <a href="#">Cancel</a></small>
+                <small class="text-muted text-center">
+                    <a asp-controller="Gigs" asp-action="Edit" asp-route-id="@gig.Id">Edit</a> |
+                    <a href="#">Cancel Event</a>
+                </small>
                 </div>
         </div>
     }

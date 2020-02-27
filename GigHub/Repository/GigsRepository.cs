@@ -32,5 +32,10 @@ namespace GigHub.Repository
             return _context.Gigs.Include(g => g.Artist).Include(g=>g.Genre)
                 .Where(g => g.DateTime > DateTime.Now && g.ArtistId == artistId);
         }
+
+        public Gig FindGigById(int id)
+        {
+            return _context.Gigs.Single(g => g.Id == id);
+        }
     }
 }

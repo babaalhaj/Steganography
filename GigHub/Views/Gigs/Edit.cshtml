@@ -1,20 +1,21 @@
-﻿@model GigsFormViewModel
+﻿@model EditGigFormViewModel
 
 @{
-    ViewData["Title"] = "Add a Gig";
+    ViewData["Title"] = "Edit Gig";
 }
 
-<h2 class="display-5">Add a Gig</h2>
+<h2 class="display-5">Edit Gig</h2>
 
 <div class="row">
 
-    <form enctype="multipart/form-data" asp-controller="Gigs" asp-action="Create" role="form" method="post">
-
+    <form enctype="multipart/form-data" asp-controller="Gigs" asp-action="Edit" role="form" method="post">
+        
+        <input type="hidden" asp-for="Gig.ArtistId"/>
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="form-group">
-            <label asp-for="Venue"></label>
-            <input type="text" asp-for="Venue" class="form-control" />
-            <span asp-validation-for="Venue" class="text-danger"></span>
+            <label asp-for="Gig.Venue"></label>
+            <input type="text" asp-for="Gig.Venue" class="form-control" />
+            <span asp-validation-for="Gig.Venue" class="text-danger"></span>
         </div>
 
         <div class="form-group">
@@ -30,11 +31,11 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="Genre"></label>
-            <select asp-for="Genre" class="form-control" asp-items="@(new SelectList(Model.Genres, "Id", "Name"))">
+            <label asp-for="Gig.GenreId"></label>
+            <select asp-for="Gig.GenreId" class="form-control" asp-items="@(new SelectList(Model.Genres, "Id", "Name"))">
                 <option>Select a Genre</option>
             </select>
-            <span asp-validation-for="Genre" class="text-danger"></span>
+            <span asp-validation-for="Gig.GenreId" class="text-danger"></span>
         </div>
 
         <div class="form-group">
@@ -45,7 +46,7 @@
             </div>
         </div>
 
-        <button class="btn btn-primary" type="submit">Save gig details &raquo;</button>
+        <button class="btn btn-primary" type="submit">Edit gig details &raquo;</button> <a asp-action="MyUpcomingGigs">Cancel</a>
 
 
     </form>

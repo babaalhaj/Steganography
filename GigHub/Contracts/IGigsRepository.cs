@@ -8,7 +8,7 @@ namespace GigHub.Contracts
         void AddAGig(Gig gig);
         IEnumerable<Gig> GetUpcomingGigs();
         IEnumerable<Gig> GetMyUpcomingGigs(string artistId);
-        //Gig FindGigById(int id);
+        Gig FindGigById(int id);
         //bool DeleteAGig(Gig gig);
     }
 }
