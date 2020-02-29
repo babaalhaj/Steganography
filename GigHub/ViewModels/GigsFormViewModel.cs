@@ -1,6 +1,7 @@
 ﻿using GigHub.BusinessRules;
 using GigHub.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,6 +27,8 @@ namespace GigHub.ViewModels
         public DateTime GetDateTime() => DateTime.Parse($"{Date} {Time}");
 
         public IFormFile Photo { get; set; }
+        public IEnumerable<SelectListItem> EncryptionTechniques { get; set; }
+        public string EncryptionType { get; set; }
         
     }
 }
