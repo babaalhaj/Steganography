@@ -198,7 +198,7 @@ namespace GigHub.Controllers
 
         private IActionResult ReturnPrivacyWarning(GigsFormViewModel model)
         {
-            ModelState.AddModelError("PrivacyWarning", "You are trying to upload image that belongs to someone else. The image has privacy and cannot be uploaded. Please change a picture");
+            ModelState.AddModelError("PrivacyWarning", "A copyright image detected, please replace image and try again.");
             model.Genres = _unitOfWork.Genres.GetGenres();
             model.EncryptionTechniques = GetEncryptionTechniques();
 
