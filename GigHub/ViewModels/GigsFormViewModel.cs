@@ -22,13 +22,13 @@ namespace GigHub.ViewModels
         [Required, Display(Name = "Genre")]
         public byte Genre { get; set; }
 
+        public int GigId { get; set; }
         public IEnumerable<Genre> Genres { get; set; }
-
         public DateTime GetDateTime() => DateTime.Parse($"{Date} {Time}");
-
         public IFormFile Photo { get; set; }
         public IEnumerable<SelectListItem> EncryptionTechniques { get; set; }
         public string EncryptionType { get; set; }
+        public string UserAction { get; set; }
         
     }
 }

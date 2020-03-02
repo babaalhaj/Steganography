@@ -27,7 +27,9 @@ namespace GigHub.Controllers
         private readonly IDataProtector _imageValueDataProtector;
         private const string NoEncryption = "Select Encryption Type";
         private const string DataProtection = "1";
-        private const string TripleDES = "2";
+        private const string TripleDes = "2";
+        private const string New = "New";
+        private const string Modify = "Modify";
         private string _uniqueImageName = string.Empty;
         public GigsController(IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager, IHostEnvironment hostEnvironment,
@@ -46,10 +48,10 @@ namespace GigHub.Controllers
             var model = new GigsFormViewModel
             {
                 Genres = _unitOfWork.Genres.GetGenres(),
-                EncryptionTechniques = GetEncryptionTechniques()
+                EncryptionTechniques = GetEncryptionTechniques(), UserAction = New
             };
 
-            return View(model);
+            return View("GigForm", model);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -67,69 +69,29 @@ namespace GigHub.Controllers
             // Check to see if a photo is selected by the user.
             if (model.Photo != null)
             {
-                using (var readStream = model.Photo.OpenReadStream())
-                {
-                    var myImage = new Bitmap(Image.FromStream(readStream));
-                    var getEncodedTextInPicture =
-                        Steganography.GetTextFromPicture(myImage); // Container for saving encoded text in picture
-
-                    // If the picture doesn't contains a text?
-                    if (string.IsNullOrEmpty(getEncodedTextInPicture))
-                    {
-                        if (model.EncryptionType == NoEncryption) // The user chooses not to sign the picture.
-                            SaveImage(myImage, out _uniqueImageName);
-                        else
-                            _uniqueImageName =
-                                EncodeAndSaveImage(model, myImage, signature,
-                                    key); // User chooses to sign the picture
-                    }
-                    else // The picture contains text.
-                    {
-                        var encryptionMethod = getEncodedTextInPicture.Substring(0, 1);
-                        var decryptedSignature = string.Empty;
-
-                        switch (encryptionMethod)
-                        {
-                            //Decrypt picture using Data Protection.
-                            case DataProtection:
-                            {
-                                decryptedSignature = _imageValueDataProtector.Unprotect(getEncodedTextInPicture.Substring(1));
-                                if (signature == decryptedSignature)
-                                    SaveImage(myImage, out _uniqueImageName);
-                                else
-                                    return ReturnPrivacyWarning(model); // picture doesn't belongs to the uploader of the image.
-                                break;
-                            }
-                            //Decrypt picture using Triple DES
-                            case TripleDES:
-                            {
-                                var checker = getEncodedTextInPicture.Substring(1);
-                                decryptedSignature = TripleDes.Decrypt(getEncodedTextInPicture.Substring(1), key);
-                                if (signature == decryptedSignature)
-                                    SaveImage(myImage, out _uniqueImageName);
-                                else return ReturnPrivacyWarning(model);
-                                break;
-                            }
-                            default:
-                                return ReturnPrivacyWarning(model);
-                        }
-                    }
-                }
+                if (ProcessImageBeforeSaving(model, signature, key, out var actionResult)) return actionResult;
             }
 
-
-            // Create a new gig object.
-            var gig = new Gig
+            if (model.UserAction == New)
             {
-                ArtistId = _userManager.GetUserId(User),
-                DateTime = model.GetDateTime(),
-                GenreId = model.Genre,
-                Venue = model.Venue,
-                ImageUrl = _uniqueImageName
-            };
-
-            // Persist the gig object into the database.
-            _unitOfWork.Gigs.AddAGig(gig);
+                // Create a new gig object.
+                var gig = new Gig
+                { ArtistId = _userManager.GetUserId(User), DateTime = model.GetDateTime(), GenreId = model.Genre,
+                    Venue = model.Venue, ImageUrl = _uniqueImageName};
+                
+                // Add gig object into gig collections.
+                _unitOfWork.Gigs.AddAGig(gig);
+            }
+            else
+            {
+                // Modify a gig object.
+                var gigInDb = _unitOfWork.Gigs.FindGigById(model.GigId);
+                gigInDb.DateTime = model.GetDateTime(); 
+                gigInDb.Venue = model.Venue;
+                gigInDb.GenreId = model.Genre;
+                if (model.Photo != null) gigInDb.ImageUrl = _uniqueImageName;
+            }
+            
             _unitOfWork.Complete();
 
             // Redirect the user to the list of his/her upcoming gigs.
@@ -138,29 +100,23 @@ namespace GigHub.Controllers
 
         public IActionResult Edit(string id)
         {
-            var empId = Convert.ToInt32(_gigIdDataProtector.Unprotect(id));
-            var gig = _unitOfWork.Gigs.FindGigById(empId);
+            var gigId = Convert.ToInt32(_gigIdDataProtector.Unprotect(id));
+            var gig = _unitOfWork.Gigs.FindGigById(gigId);
 
-            var model = new EditGigFormViewModel(gig)
+            //var model = new EditGigFormViewModel(gig)
+            //{
+            //    Genres = _unitOfWork.Genres.GetGenres()
+            //};
+
+            var model = new GigsFormViewModel()
             {
-                Genres = _unitOfWork.Genres.GetGenres()
+                Genres = _unitOfWork.Genres.GetGenres(), UserAction = Modify, EncryptionTechniques = GetEncryptionTechniques(), GigId = gig.Id,
+                Venue = gig.Venue, Genre = gig.GenreId, Date = gig.DateTime.ToShortDateString(), Time = gig.DateTime.ToShortTimeString()
             };
-            return View(model);
+
+            return View("GigForm", model);
         }
-
-        [HttpPost]
-        public IActionResult Edit(EditGigFormViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                model.Genres = _unitOfWork.Genres.GetGenres();
-                return View(model);
-            }
-
-            var artistId = _userManager.GetUserId(User);
-            return RedirectToAction("MyUpcomingGigs", _unitOfWork.Gigs.GetMyUpcomingGigs(artistId));
-        }
-
+        
         [AllowAnonymous]
         public IActionResult AllUpcomingGigs()
         {
@@ -178,6 +134,73 @@ namespace GigHub.Controllers
             return View(GetMyUpcomingModel(artistId));
         }
 
+        private bool ProcessImageBeforeSaving(GigsFormViewModel model, string signature, string key,
+            out IActionResult actionResult)
+        {
+            using (var readStream = model.Photo.OpenReadStream())
+            {
+                var myImage = new Bitmap(Image.FromStream(readStream));
+                var getEncodedTextInPicture =
+                    Steganography.GetTextFromPicture(myImage); // Container for saving encoded text in picture
+
+                // If the picture doesn't contains a text?
+                if (string.IsNullOrEmpty(getEncodedTextInPicture))
+                {
+                    if (model.EncryptionType == NoEncryption) // The user chooses not to sign the picture.
+                        SaveImage(myImage, out _uniqueImageName);
+                    else
+                        _uniqueImageName =
+                            EncodeAndSaveImage(model, myImage, signature,
+                                key); // User chooses to sign the picture
+                }
+                else // The picture contains text.
+                {
+                    var encryptionMethod = getEncodedTextInPicture.Substring(0, 1);
+                    string decryptedSignature;
+
+                    switch (encryptionMethod)
+                    {
+                        //Decrypt picture using Data Protection.
+                        case DataProtection:
+                        {
+                            decryptedSignature = _imageValueDataProtector.Unprotect(getEncodedTextInPicture.Substring(1));
+                            if (signature == decryptedSignature)
+                                SaveImage(myImage, out _uniqueImageName);
+                            else
+                            {
+                                actionResult = ReturnPrivacyWarning(model);
+                                return true;
+                            }
+
+                            break;
+                        }
+                        //Decrypt picture using Triple DES
+                        case TripleDes:
+                        {
+                            decryptedSignature = Security.TripleDes.Decrypt(getEncodedTextInPicture.Substring(1), key);
+                            if (signature == decryptedSignature)
+                                SaveImage(myImage, out _uniqueImageName);
+                            else
+                            {
+                                actionResult = ReturnPrivacyWarning(model);
+                                return true;
+                            }
+
+                            break;
+                        }
+                        default:
+                        {
+                            actionResult = ReturnPrivacyWarning(model);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            actionResult = null;
+            return false;
+        }
+
         private IEnumerable<Gig> GetMyUpcomingModel(string artistId)
         {
             return _unitOfWork.Gigs.GetMyUpcomingGigs(artistId)
@@ -193,7 +216,7 @@ namespace GigHub.Controllers
             model.Genres = _unitOfWork.Genres.GetGenres();
             model.EncryptionTechniques = GetEncryptionTechniques();
 
-            return View("Create", model);
+            return View("GigForm", model);
         }
 
         private IActionResult ReturnPrivacyWarning(GigsFormViewModel model)
@@ -202,7 +225,7 @@ namespace GigHub.Controllers
             model.Genres = _unitOfWork.Genres.GetGenres();
             model.EncryptionTechniques = GetEncryptionTechniques();
 
-            return View("Create", model);
+            return View("GigForm", model);
         }
         private static IEnumerable<SelectListItem> GetEncryptionTechniques()
         {
@@ -255,11 +278,6 @@ namespace GigHub.Controllers
 
             myImage.Save(filePath);
         }
-
-        //private async Task<bool> IsSignatureAvailable(string decryptedSignature)
-        //{
-        //    var user = await _userManager.FindByEmailAsync(decryptedSignature);
-        //    return user != null;
-        //}
+        
     }
 }
