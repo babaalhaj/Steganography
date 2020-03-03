@@ -89,7 +89,14 @@ namespace GigHub.Controllers
                 gigInDb.DateTime = model.GetDateTime(); 
                 gigInDb.Venue = model.Venue;
                 gigInDb.GenreId = model.Genre;
-                if (model.Photo != null) gigInDb.ImageUrl = _uniqueImageName;
+                if (model.Photo != null)
+                {
+                    var oldImage = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\images\",gigInDb.ImageUrl);
+                    if(System.IO.File.Exists(oldImage))
+                        System.IO.File.Delete(oldImage);
+
+                    gigInDb.ImageUrl = _uniqueImageName;
+                }
             }
             
             _unitOfWork.Complete();
