@@ -30,14 +30,20 @@
                 <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
                 <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
             </div>
-            @if (SignInManager.IsSignedIn(User) && UserManager.GetUserId(User) != @gig.Artist.Id)
+            @*@if (SignInManager.IsSignedIn(User) && UserManager.GetUserId(User) != @gig.Artist.Id)
+        {
+            <div class="card-footer">
+                <small class="text-muted text-center">
+                    <a id="attendances" data-gig-id="@gig.Id" class="btn btn-primary js-toggle-attendance" href="#">Attending?</a>
+                </small>
+            </div>
+        }*@
+            @if (gig.IsCanceled)
             {
                 <div class="card-footer">
-                    <small class="text-muted text-center">
-                        Click to
-                        <a id="attendances" data-gig-id="@gig.Id" class="js-toggle-attendance" href="#">add</a>
-                        gig to list of gigs you'll be attending.
-                    </small>
+                    <div class="text-muted text-center">
+                        <div class="badge badge-pill badge-warning card-text"><strong><text>Notice: </text> </strong>This gig has been canceled</div>
+                    </div>
                 </div>
             }
 
@@ -67,14 +73,13 @@ else
                 var link = $(e.target);
                 $.post("/api/attendances", { gigId : link.attr("data-gig-id") })
                     .done(function() {
-                        if ($("#attendances").text() == "add") {
-                            link.text("remove");
-                        } else {
-                            link.text("add");
-                        }
+                        toas
+                        alert("Added successfully");
+                        toastr.success("Added successfully");
                     })
                     .fail(function() {
-                        alert("Something went wrong.");
+                        alert("Attendance already exists for this gig");
+                        toastr.error("Attendance already exists for this gig");
                     });
             });
         });

@@ -7,6 +7,7 @@ namespace GigHub.Contracts
     {
         void AddAttendance(Attendance attendance);
         void RemoveAttendance(Attendance attendance);
+        List<Gig> GigsIAmAttending(string userId);
         IEnumerable<Attendance> AllAttendances();
     }
 }

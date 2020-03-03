@@ -2,7 +2,7 @@
 
 
 @{
-    ViewData["Title"] = "My Upcoming Gigs";
+    ViewData["Title"] = ViewBag.Title;
 }
 
 <div class="text-center">
@@ -26,10 +26,10 @@
                     <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
                 </div>
                 <div class="card-footer" style="font-weight: bolder;">
-                    <small class="text-muted text-center">
+                    <div class="text-muted text-center">
                         <a asp-controller="Gigs" asp-action="Edit" asp-route-id="@gig.EncryptedGigId">Edit</a> |
-                        <a href="#">Cancel Event</a>
-                    </small>
+                        <a class="js-cancel-gig" data-gig-id="@gig.EncryptedGigId" href="#">Delete Event</a>
+                    </div>
                 </div>
             </div>
         }
@@ -38,9 +38,52 @@
 }
 else
 {
-<div class="jumbotron">
-    <h2 class="lead">You have no upcoming gig in our records, click<a class="btn-link" asp-controller="Gigs" asp-action="Create"> here</a> to start adding a gig.</h2>
-</div>
-    
-        }
-        
+    <div class="jumbotron">
+        <h2 class="lead">You have no upcoming gig in our records, click<a class="btn-link" asp-controller="Gigs" asp-action="Create"> here</a> to start adding a gig.</h2>
+    </div>
+
+}
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function ()
+        {
+            $(".js-cancel-gig").click(function (e) {
+                var link = $(e.target);
+                var dialog = bootbox.dialog({
+                    title: 'Confirm delete operation',
+                    message: "<p>Are you sure you want to cancel this event.</p>",
+                    size: 'large',
+                    buttons: {
+                        cancel: {
+                            label: "No",
+                            className: 'btn-success',
+                            callback: function() {
+                                bootbox.hideAll();
+                            }
+                            
+                        },
+                        ok: {
+                            label: "Yes",
+                            className: 'btn-danger',
+                            callback: function() {
+                                $.ajax({
+                                    url:"/api/gigs/" + link.attr("data-gig-id"),
+                                    method: "DELETE"
+                                }).done(function() {
+                                    link.parents("div.card").fadeOut(function() {
+                                        $(this).remove();
+                                    }).fail(function() {
+                                        alert("Something went wrong");
+                                    });
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
+

@@ -130,8 +130,20 @@ namespace GigHub.Controllers
 
         public IActionResult MyUpcomingGigs()
         {
+            ViewBag.Title = "My Upcoming Gigs";
             var artistId = _userManager.GetUserId(User);
             return View(GetMyUpcomingModel(artistId));
+        }
+
+        public IActionResult Attending()
+        {
+            
+            ViewBag.Title = "Gigs I'm Attending";
+            var userId = _userManager.GetUserId(User);
+            var attendances = _unitOfWork.Attendances.GigsIAmAttending(userId);
+            
+
+            return View("MyUpcomingGigs", attendances);
         }
 
         private bool ProcessImageBeforeSaving(GigsFormViewModel model, string signature, string key,

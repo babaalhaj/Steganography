@@ -28,5 +28,6 @@ namespace GigHub.Models
 
         public string ImageUrl { get; set; }
 
+        public bool IsCanceled { get; set; }
     }
 }
