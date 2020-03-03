@@ -1,12 +1,11 @@
-﻿using System.Threading.Tasks;
-
-namespace GigHub.Contracts
+﻿namespace GigHub.Contracts
 {
     public interface IUnitOfWork
     {
         IGenresRepository Genres { get; }
         IGigsRepository Gigs { get; }
-        Task<int> AsyncComplete();
+        IAttendancesRepository Attendances { get; }
+        //Task<int> AsyncComplete();
         int Complete();
     }
 }

@@ -1,4 +1,8 @@
-﻿@model IEnumerable<Gig>
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<Gig>
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
 
 
 @{
@@ -17,19 +21,25 @@
         @foreach (var gig in Model.Take(3))
         {
             var photoPath = "~/images/" + (gig.ImageUrl ?? "noimage.jpg");
-            <div class="card m-3 card-arrangements">
-                <img src=@photoPath class="card-img-top imageThumbnail" alt="@gig.Artist.Name" asp-append-version="true">
-                <div class="card-body">
-                    <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
-                    <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
-                    <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
-                    <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
-                </div>
-                @*<div class="card-footer">
-                        <small class="text-muted text-center"><a href="#">Edit</a> | <a href="#">Delete</a></small>
-                    </div>*@
-
+        <div class="card m-3 card-arrangements">
+            <img src=@photoPath class="card-img-top imageThumbnail" alt="@gig.Artist.Name" asp-append-version="true">
+            <div class="card-body">
+                <div class="card-text"><strong><text>Artist: </text></strong>@UserManager.GetUserName(User)</div>
+                <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
+                <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
+                <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
+                <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
             </div>
+            @*@if (SignInManager.IsSignedIn(User) && UserManager.GetUserName(User) != @gig.Artist.Name)
+            {
+
+            }*@
+            <div class="card-footer">
+                <small class="text-muted text-center">Click to
+                    <a id="attendances" data-gig-id="@gig.Id" class="js-toggle-attendance" href="#">add</a> 
+                    gig to list of gigs you'll be attending.</small>
+            </div>
+        </div>
         }
 
     </div>
@@ -41,13 +51,30 @@ else
     </div>
 }
 
-
-
-
 <p>
     @if (Model.Count() > 3)
     {
-        <a asp-controller="Gigs" asp-action="AllUpcomingGigs" class="badge badge-success">Show more &raquo;</a>
+        <a asp-controller="Gigs" asp-action="AllUpcomingGigs"> <span class="badge badge-success">Show more &raquo;</span></a>
     }
 </p>
 
+@section Scripts{
+    <script>
+        $(document).ready(function() {
+            $(".js-toggle-attendance").click(function(e) {
+                var link = $(e.target);
+                $.post("/api/attendances", { gigId : link.attr("data-gig-id") })
+                    .done(function() {
+                        if ($("#attendances").text() == "add") {
+                            link.text("remove");
+                        } else {
+                            link.text("add");
+                        }
+                    })
+                    .fail(function() {
+                        alert("Something went wrong.");
+                    });
+            });
+        });
+    </script>
+}
