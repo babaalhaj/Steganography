@@ -22,15 +22,22 @@
     <div class="card m-3 card-arrangements">
         <img src=@photoPath class="card-img-top imageThumbnail" alt="@gig.Artist.Name" asp-append-version="true">
         <div class="card-body">
+            <div class="card-text"><strong><text>Artist: </text></strong>@gig.Artist.Name</div>
             <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
             <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
             <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
             <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
         </div>
-        @*(SignInManager.IsSignedIn(User) && UserManager.GetUserName(User) == @gig.Artist.Name)*@
-        <div class="card-footer">
-                <small class="text-muted text-center">Click <a href="#">here</a> to add gig to list of gigs you'll be attending.</small>
+        @if (SignInManager.IsSignedIn(User) && UserManager.GetUserId(User) != @gig.Artist.Id)
+        {
+            <div class="card-footer">
+                <small class="text-muted text-center">
+                    Click to
+                    <a id="attendances" data-gig-id="@gig.Id" class="js-toggle-attendance" href="#">add</a>
+                    gig to list of gigs you'll be attending.
+                </small>
             </div>
+        }
     </div>
     }
 

@@ -1,6 +1,5 @@
 ﻿using GigHub.Contracts;
 using GigHub.Models;
-using GigHub.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -21,6 +20,7 @@ namespace GigHub.Controllers
         public IActionResult Index()
         {
             var upcomingGigs = _unitOfWork.Gigs.GetUpcomingGigs();
+            
             return View(upcomingGigs);
         }
 
