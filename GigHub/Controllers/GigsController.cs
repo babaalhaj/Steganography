@@ -62,23 +62,32 @@ namespace GigHub.Controllers
 
            // Check if the model state is valid with correct inputs from the user.
             if (!ModelState.IsValid)
-            {
                 return ReturnEntryToUser(model);
-            }
-
+            
             // Check to see if a photo is selected by the user.
             if (model.Photo != null)
             {
                 if (ProcessImageBeforeSaving(model, signature, key, out var actionResult)) return actionResult;
             }
 
+            CreateOrModifyAGig(model); // Create a gig object if adding a new gig or modify gig object if modifying a gig.
+            _unitOfWork.Complete(); // Commit changes to the repository.
+
+            // Redirect the user to the list of his/her upcoming gigs.
+            return View("MyUpcomingGigs", GetMyUpcomingModel(key));
+        }
+
+        private void CreateOrModifyAGig(GigsFormViewModel model)
+        {
             if (model.UserAction == New)
             {
                 // Create a new gig object.
                 var gig = new Gig
-                { ArtistId = _userManager.GetUserId(User), DateTime = model.GetDateTime(), GenreId = model.Genre,
-                    Venue = model.Venue, ImageUrl = _uniqueImageName};
-                
+                {
+                    ArtistId = _userManager.GetUserId(User), DateTime = model.GetDateTime(), GenreId = model.Genre,
+                    Venue = model.Venue, ImageUrl = _uniqueImageName
+                };
+
                 // Add gig object into gig collections.
                 _unitOfWork.Gigs.AddAGig(gig);
             }
@@ -86,23 +95,18 @@ namespace GigHub.Controllers
             {
                 // Modify a gig object.
                 var gigInDb = _unitOfWork.Gigs.FindGigById(model.GigId);
-                gigInDb.DateTime = model.GetDateTime(); 
+                gigInDb.DateTime = model.GetDateTime();
                 gigInDb.Venue = model.Venue;
                 gigInDb.GenreId = model.Genre;
                 if (model.Photo != null)
                 {
-                    var oldImage = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\images\",gigInDb.ImageUrl);
-                    if(System.IO.File.Exists(oldImage))
+                    var oldImage = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\images\", gigInDb.ImageUrl);
+                    if (System.IO.File.Exists(oldImage))
                         System.IO.File.Delete(oldImage);
 
                     gigInDb.ImageUrl = _uniqueImageName;
                 }
             }
-            
-            _unitOfWork.Complete();
-
-            // Redirect the user to the list of his/her upcoming gigs.
-            return View("MyUpcomingGigs", GetMyUpcomingModel(key));
         }
 
         public IActionResult Edit(string id)
