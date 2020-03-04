@@ -143,7 +143,9 @@ namespace GigHub.Controllers
         {
             ViewBag.Title = "My Upcoming Gigs";
             var artistId = _userManager.GetUserId(User);
-            return View(GetMyUpcomingModel(artistId));
+            var model = GetMyUpcomingModel(artistId).Where(g => g.IsCanceled == false);
+
+            return View(model);
         }
 
         public IActionResult Attending()

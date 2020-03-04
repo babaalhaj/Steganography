@@ -13,28 +13,29 @@
 
 @if (Model.Any())
 {
-    <div class="card-deck">
-        @foreach (var gig in Model)
-        {
-            var photoPath = "~/images/" + (gig.ImageUrl ?? "noimage.jpg");
-            <div class="card m-3 card-arrangements">
-                <img src=@photoPath class="card-img-top imageThumbnail" alt="@gig.Artist.Name" asp-append-version="true">
-                <div class="card-body">
-                    <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
-                    <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
-                    <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
-                    <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
-                </div>
-                <div class="card-footer" style="font-weight: bolder;">
-                    <div class="text-muted text-center">
-                        <a asp-controller="Gigs" asp-action="Edit" asp-route-id="@gig.EncryptedGigId">Edit</a> |
-                        <a class="js-cancel-gig" data-gig-id="@gig.EncryptedGigId" href="#">Delete Event</a>
-                    </div>
+<div class="card-deck">
+    @foreach (var gig in Model)
+    {
+        var photoPath = "~/images/" + (gig.ImageUrl ?? "noimage.jpg");
+        <div class="card m-3 card-arrangements">
+            <img src=@photoPath class="card-img-top imageThumbnail" alt="@gig.Artist.Name" asp-append-version="true">
+            <div class="card-body">
+                <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
+                <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
+                <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
+                <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
+            </div>
+            <div class="card-footer" style="font-weight: bolder;">
+                <div class="text-muted text-center">
+                    <a asp-controller="Gigs" asp-action="Edit" asp-route-id="@gig.EncryptedGigId">Edit</a> |
+                    <a class="js-cancel-gig" data-gig-id="@gig.EncryptedGigId" href="#">Delete Event</a>
                 </div>
             </div>
-        }
+        </div>
+       
+    }
 
-    </div>
+</div>
 }
 else
 {
