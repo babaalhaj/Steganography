@@ -15,28 +15,38 @@
 
 <h6 class="display-5 voffset2">Upcoming Gigs</h6>
 
-<div class="card-deck">
-    @foreach (var gig in Model)
-    {
-        var photoPath = "~/images/" + (gig.ImageUrl ?? "noimage.jpg");
-    <div class="card m-3 card-arrangements">
-        <img src=@photoPath class="card-img-top imageThumbnail" alt="@gig.Artist.Name" asp-append-version="true">
-        <div class="card-body">
-            <div class="card-text"><strong><text>Artist: </text></strong>@gig.Artist.Name</div>
-            <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
-            <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
-            <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
-            <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
-        </div>
-        @if (gig.IsCanceled)
+@if (Model.Any())
+{
+    <div class="card-deck">
+        @foreach (var gig in Model)
         {
-            <div class="card-footer">
-                <div class="text-muted text-center">
-                    <div class="badge badge-pill badge-warning card-text"><strong><text>Notice: </text> </strong>This gig has been canceled</div>
+            var photoPath = "~/images/" + (gig.ImageUrl ?? "noimage.jpg");
+            <div class="card m-3 card-arrangements">
+                <img src=@photoPath class="card-img-top imageThumbnail" alt="@gig.Artist.Name" asp-append-version="true">
+                <div class="card-body">
+                    <div class="card-text"><strong><text>Artist: </text></strong>@gig.Artist.Name</div>
+                    <div class="card-text"><strong><text>Genre: </text></strong>@gig.Genre.Name</div>
+                    <div class="card-text"><strong><text>Venue: </text></strong>@gig.Venue</div>
+                    <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
+                    <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
                 </div>
+                @if (gig.IsCanceled)
+                {
+                    <div class="card-footer">
+                        <div class="text-muted text-center">
+                            <div class="badge badge-pill badge-warning card-text"><strong><text>Notice: </text> </strong>This gig has been canceled</div>
+                        </div>
+                    </div>
+                }
             </div>
         }
-    </div>
-    }
 
-</div>
+    </div>
+}
+else
+{
+    <div class="jumbotron">
+        <h2 class="lead">No upcoming gigs in our records, click<a class="btn-link" asp-controller="Gigs" asp-action="Create"> here</a> to start adding a gig.</h2>
+    </div>
+}
+

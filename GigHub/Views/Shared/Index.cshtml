@@ -30,14 +30,7 @@
                 <div class="card-text"><strong><text>Date: </text> </strong><em>@gig.DateTime.ToLongDateString()</em></div>
                 <div class="card-text"><strong><text>Time: </text> </strong><em>@gig.DateTime.ToShortTimeString()</em></div>
             </div>
-            @*@if (SignInManager.IsSignedIn(User) && UserManager.GetUserId(User) != @gig.Artist.Id)
-        {
-            <div class="card-footer">
-                <small class="text-muted text-center">
-                    <a id="attendances" data-gig-id="@gig.Id" class="btn btn-primary js-toggle-attendance" href="#">Attending?</a>
-                </small>
-            </div>
-        }*@
+            
             @if (gig.IsCanceled)
             {
                 <div class="card-footer">

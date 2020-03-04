@@ -30,7 +30,7 @@ namespace GigHub.Controllers
         private const string TripleDes = "2";
         private const string New = "New";
         private const string Modify = "Modify";
-        private string _uniqueImageName = string.Empty;
+        private string _uniqueImageName;
         public GigsController(IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager, IHostEnvironment hostEnvironment,
             IDataProtectionProvider dataProtectionProvider, DataProtectionPurposeStrings dataProtectionPurposeStrings)
@@ -75,38 +75,6 @@ namespace GigHub.Controllers
 
             // Redirect the user to the list of his/her upcoming gigs.
             return View("MyUpcomingGigs", GetMyUpcomingModel(key));
-        }
-
-        private void CreateOrModifyAGig(GigsFormViewModel model)
-        {
-            if (model.UserAction == New)
-            {
-                // Create a new gig object.
-                var gig = new Gig
-                {
-                    ArtistId = _userManager.GetUserId(User), DateTime = model.GetDateTime(), GenreId = model.Genre,
-                    Venue = model.Venue, ImageUrl = _uniqueImageName
-                };
-
-                // Add gig object into gig collections.
-                _unitOfWork.Gigs.AddAGig(gig);
-            }
-            else
-            {
-                // Modify a gig object.
-                var gigInDb = _unitOfWork.Gigs.FindGigById(model.GigId);
-                gigInDb.DateTime = model.GetDateTime();
-                gigInDb.Venue = model.Venue;
-                gigInDb.GenreId = model.Genre;
-                if (model.Photo != null)
-                {
-                    var oldImage = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\images\", gigInDb.ImageUrl);
-                    if (System.IO.File.Exists(oldImage))
-                        System.IO.File.Delete(oldImage);
-
-                    gigInDb.ImageUrl = _uniqueImageName;
-                }
-            }
         }
 
         public IActionResult Edit(string id)
@@ -224,6 +192,38 @@ namespace GigHub.Controllers
 
             actionResult = null;
             return false;
+        }
+
+        private void CreateOrModifyAGig(GigsFormViewModel model)
+        {
+            if (model.UserAction == New)
+            {
+                // Create a new gig object.
+                var gig = new Gig
+                {
+                    ArtistId = _userManager.GetUserId(User), DateTime = model.GetDateTime(), GenreId = model.Genre,
+                    Venue = model.Venue, ImageUrl = _uniqueImageName
+                };
+
+                // Add gig object into gig collections.
+                _unitOfWork.Gigs.AddAGig(gig);
+            }
+            else
+            {
+                // Modify a gig object.
+                var gigInDb = _unitOfWork.Gigs.FindGigById(model.GigId);
+                gigInDb.DateTime = model.GetDateTime();
+                gigInDb.Venue = model.Venue;
+                gigInDb.GenreId = model.Genre;
+                if (model.Photo != null)
+                {
+                    var oldImage = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\images\", gigInDb.ImageUrl);
+                    if (System.IO.File.Exists(oldImage))
+                        System.IO.File.Delete(oldImage);
+
+                    gigInDb.ImageUrl = _uniqueImageName;
+                }
+            }
         }
 
         private IEnumerable<Gig> GetMyUpcomingModel(string artistId)
