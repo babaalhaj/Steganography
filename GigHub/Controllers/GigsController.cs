@@ -30,7 +30,7 @@ namespace GigHub.Controllers
         private const string TripleDes = "2";
         private const string New = "New";
         private const string Modify = "Modify";
-        private string _uniqueImageName;
+        private string _uniqueImageName = null;
         public GigsController(IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager, IHostEnvironment hostEnvironment,
             IDataProtectionProvider dataProtectionProvider, DataProtectionPurposeStrings dataProtectionPurposeStrings)
@@ -217,10 +217,12 @@ namespace GigHub.Controllers
                 gigInDb.GenreId = model.Genre;
                 if (model.Photo != null)
                 {
-                    var oldImage = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\images\", gigInDb.ImageUrl);
-                    if (System.IO.File.Exists(oldImage))
-                        System.IO.File.Delete(oldImage);
-
+                    if (gigInDb.ImageUrl != null)
+                    {
+                        var oldImage = Path.Combine(_hostEnvironment.ContentRootPath, @"wwwroot\images\", gigInDb.ImageUrl);
+                        if (System.IO.File.Exists(oldImage))
+                            System.IO.File.Delete(oldImage);
+                    }
                     gigInDb.ImageUrl = _uniqueImageName;
                 }
             }
